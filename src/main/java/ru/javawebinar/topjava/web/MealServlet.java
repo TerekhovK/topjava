@@ -28,8 +28,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private static final long serialVersionUID = 1L;
-    private static String INSERT_OR_EDIT = "/addmeal.jsp";
-    private static String LIST_MEAL = "/meals.jsp";
     private MealDAO dao;
 
     @Override
@@ -42,9 +40,10 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        String forward = "";
+        String forward;
         String action = req.getParameter("action");
         action = (action == null ? "" : action);
+        String addOrEdit = "/addmeal.jsp";
         if (action.equalsIgnoreCase("delete")) {
             long mealId = Long.valueOf(req.getParameter("mealId"));
             log.info("Delete meal with id:" + mealId);
@@ -52,18 +51,18 @@ public class MealServlet extends HttpServlet {
             resp.sendRedirect("meals");
             return;
         } else if (action.equalsIgnoreCase("edit")) {
-            forward = INSERT_OR_EDIT;
+            forward = addOrEdit;
             long mealId = Long.valueOf(req.getParameter("mealId"));
             Meal meal = dao.getMealById(mealId);
             log.info("Update meal with id:" + mealId);
             req.setAttribute("meal", meal);
         } else if (action.equalsIgnoreCase("addMeal")) {
-            forward = INSERT_OR_EDIT;
+            forward = addOrEdit;
             log.info("Add new meal");
             Meal meal = dao.addMeal(new Meal(LocalDateTime.now(), "", 0));
             req.setAttribute("meal", meal);
         } else {
-            forward = LIST_MEAL;
+            forward = "/meals.jsp";
             log.info("Get all meals");
             req.setAttribute("meals", MealsUtil.getFilteredWithExceeded(dao.getAllMeals(), LocalTime.MIN, LocalTime.MAX, MealsUtil.DEFAULT_CALORIES_PER_ONE_DAY));
         }
