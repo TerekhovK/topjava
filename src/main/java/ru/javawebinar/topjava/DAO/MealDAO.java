@@ -1,19 +1,29 @@
-package ru.javawebinar.topjava.DAO;
+package ru.javawebinar.topjava.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.javawebinar.topjava.model.Meal;
 
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public interface MealDAO {
-    Meal getMealById(long id);
+    Meal getById(long id);
 
-    Meal addMeal(Meal meal);
+    Meal add(Meal meal);
 
-    boolean deleteMeal(long id);
+    boolean delete(long id);
 
-    Meal updateMeal(Meal meal);
+    Meal update(Meal meal);
 
-    List<Meal> getAllMeals();
+    List<Meal> getAll();
+
+
 }

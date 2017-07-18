@@ -33,6 +33,6 @@
         </tr>
     </c:forEach>
 </table>
-<p><a href="meals?action=addMeal">Add User</a></p>
+<p><a href="meals?action=add">Add User</a></p>
 </body>
 </html>
