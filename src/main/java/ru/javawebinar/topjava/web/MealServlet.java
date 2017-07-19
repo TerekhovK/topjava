@@ -43,7 +43,7 @@ public class MealServlet extends HttpServlet {
         String forward;
         String action = req.getParameter("action");
         action = (action == null ? "" : action);
-        String addOrEdit = "/addmeal.jsp";
+        String addOrEdit = "/meal.jsp";
         if (action.equalsIgnoreCase("delete")) {
             long mealId = Long.valueOf(req.getParameter("mealId"));
             log.info("Delete meal with id:" + mealId);
