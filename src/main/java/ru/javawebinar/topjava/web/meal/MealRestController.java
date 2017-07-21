@@ -1,8 +1,70 @@
 package ru.javawebinar.topjava.web.meal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import ru.javawebinar.topjava.AuthorizedUser;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealWithExceed;
+import ru.javawebinar.topjava.util.MealsUtil;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+@Controller
 public class MealRestController {
+    private static final Logger log = LoggerFactory.getLogger(MealRestController.class);
+
+    @Autowired
     private MealService service;
 
+
+    public List<MealWithExceed> getAll(String startDate, String endDate, String startTime, String endTime) {
+        LocalDate stDate = (startDate.equals("")) ? LocalDate.MIN : LocalDate.parse(startDate);
+        LocalTime stTime = (startTime.equals("")) ? LocalTime.MIN : LocalTime.parse(startTime);
+
+        LocalDateTime startDateTime = LocalDateTime.of(stDate, stTime);
+
+        LocalTime enTime = (endTime.equals("")) ? LocalTime.MAX : LocalTime.parse(endTime);
+        LocalDate enDate = (endDate.equals("")) ? LocalDate.MAX : LocalDate.parse(endDate);
+
+        LocalDateTime endDateTime = LocalDateTime.of(enDate, enTime);
+        log.info("getAll filtered by startDateTime{} and endDateTime{}",startDateTime,endDateTime);
+        return MealsUtil.getFilteredWithExceeded(service.getAllFiltered(AuthorizedUser.id(), startDateTime.toLocalDate(), endDateTime.toLocalDate()),
+                                                 startDateTime.toLocalTime(),
+                                                 endDateTime.toLocalTime(),
+                                                 AuthorizedUser.getCaloriesPerDay());
+    }
+
+    public List<MealWithExceed> getAll() {
+        log.info("getAll");
+
+        return MealsUtil.getFilteredWithExceeded(service.getAll(AuthorizedUser.id()), LocalTime.MIN, LocalTime.MAX, AuthorizedUser.getCaloriesPerDay());
+    }
+
+    public Meal get(int id) {
+        log.info("get {}", id);
+
+        return service.get(id, AuthorizedUser.id());
+    }
+
+    public Meal create(Meal meal) {
+        meal.setUserId(AuthorizedUser.id());
+        log.info("save {}", meal);
+        return service.save(meal, AuthorizedUser.id());
+    }
+
+    public void delete(int id) {
+        log.info("delete {}", id);
+        service.delete(id, AuthorizedUser.id());
+    }
+
+    public Meal update(Meal meal) {
+        log.info("update {} with id={}", meal, AuthorizedUser.id());
+        return service.update(meal, AuthorizedUser.id());
+    }
 }

@@ -19,7 +19,12 @@ public class MealsUtil {
             new Meal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500,1),
             new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000,1),
             new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500,1),
-            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510,1)
+            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510,1),
+            new Meal(LocalDateTime.of(2016, Month.MAY, 1, 10, 0), "Завтрак", 500,2),
+            new Meal(LocalDateTime.of(2016, Month.MAY, 1, 20, 0), "Ужин", 1500,2),
+            new Meal(LocalDateTime.of(2016, Month.MAY, 2, 10, 0), "Завтрак", 1000,2),
+            new Meal(LocalDateTime.of(2016, Month.MAY, 2, 13, 0), "Обед", 1600,2)
+
     );
 
     public static final int DEFAULT_CALORIES_PER_DAY = 2000;
@@ -65,7 +70,7 @@ public class MealsUtil {
     /*
      *  Advanced solution in one return (listDayMeals can be inline).
      *  Streams are not multiplied, so complexity is still O(N)
-     *  Execution time is increased as for every day we create 2 additional streams
+     *  Execution time is increased as for every day we save 2 additional streams
      */
     public static List<MealWithExceed> getFilteredWithExceededInOneReturn(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
 

@@ -12,13 +12,13 @@ public class Meal extends BaseEntity {
 
     private final int calories;
 
-    private final int userId;
+    private Integer userId;
 
-    public Meal(LocalDateTime dateTime, String description, int calories, int userId) {
+    public Meal(LocalDateTime dateTime, String description, int calories, Integer userId) {
         this(null, dateTime, description, calories, userId);
     }
 
-    public Meal(Integer id, LocalDateTime dateTime, String description, int calories,int userId) {
+    public Meal(Integer id, LocalDateTime dateTime, String description, int calories,Integer userId) {
         super(id);
         this.dateTime = dateTime;
         this.description = description;
@@ -32,6 +32,10 @@ public class Meal extends BaseEntity {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public int getCalories() {

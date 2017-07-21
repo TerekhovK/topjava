@@ -16,10 +16,26 @@
     </style>
 </head>
 <body>
+
 <section>
     <h3><a href="index.html">Home</a></h3>
     <h2>Meal list</h2>
-    <a href="meals?action=create">Add Meal</a>
+    <section>
+        <form method="get" action="meals">
+            <input type="hidden" name="action" value="filter">
+            <dl>
+                <dt>Date:</dt>
+                <dd><input type="date" name="dateFrom">From</dd>
+                <dd><input type="date" name="dateTo">To</dd>
+            </dl>
+            <dl>
+                <dt>Time:</dt>
+                <dd><input type="time" name="timeFrom">from</dd>
+                <dd><input type="time" name="timeTo">to</dd>
+            </dl>
+            <button type="submit">Filter</button>
+        </form>
+    </section>
     <hr/>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
@@ -46,6 +62,8 @@
             </tr>
         </c:forEach>
     </table>
+    <br>
+    <a href="meals?action=create">Add Meal</a>
 </section>
 </body>
 </html>
