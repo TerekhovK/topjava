@@ -37,22 +37,37 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
+        String action=request.getParameter("action");
         String id = request.getParameter("id");
+        switch (action == null ? "all" : action) {
+            case "filter":
+                String startTime = request.getParameter("timeFrom");
+                String endTime = request.getParameter("timeTo");
+                String startDate = request.getParameter("dateFrom");
+                String endDate = request.getParameter("dateTo");
+                request.setAttribute("meals", mealRestController.getAll(startDate, endDate, startTime, endTime));
+                log.info("getAllFiltered");
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                break;
+            case "all":
+                Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
+                        LocalDateTime.parse(request.getParameter("dateTime")),
+                        request.getParameter("description"),
+                        Integer.valueOf(request.getParameter("calories")),
+                        AuthorizedUser.id());
 
-        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                LocalDateTime.parse(request.getParameter("dateTime")),
-                request.getParameter("description"),
-                Integer.valueOf(request.getParameter("calories")),
-                AuthorizedUser.id());
+                log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
 
-        log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-        if (meal.isNew()) {
-            mealRestController.create(meal);
-        } else {
-            mealRestController.update(meal);
+                if (meal.isNew()) {
+                    mealRestController.create(meal);
+                } else {
+                    mealRestController.update(meal);
+                }
+
+                response.sendRedirect("meals");
+                break;
         }
-        response.sendRedirect("meals");
+
     }
 
     @Override
@@ -73,15 +88,6 @@ public class MealServlet extends HttpServlet {
                         mealRestController.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/meal.jsp").forward(request, response);
-                break;
-            case "filter":
-                String startTime = request.getParameter("timeFrom");
-                String endTime = request.getParameter("timeTo");
-                String startDate = request.getParameter("dateFrom");
-                String endDate = request.getParameter("dateTo");
-                request.setAttribute("meals", mealRestController.getAll(startDate, endDate, startTime, endTime));
-                log.info("getAllFiltered");
-                request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
             case "all":
             default:

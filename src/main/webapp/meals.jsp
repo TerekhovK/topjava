@@ -21,7 +21,7 @@
     <h3><a href="index.html">Home</a></h3>
     <h2>Meal list</h2>
     <section>
-        <form method="get" action="meals">
+        <form method="post" action="meals">
             <input type="hidden" name="action" value="filter">
             <dl>
                 <dt>Date:</dt>
