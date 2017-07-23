@@ -28,38 +28,40 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        log.info("save meal {} and userId{}", meal, userId);
+
 
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
+            log.info("save meal {} and userId{}", meal, userId);
+            repository.put(meal.getId(), meal);
+            return meal;
+        }
+        else{
+            if(repository.get(meal.getId()).getUserId()!=meal.getUserId()){
+                return null;
+            }
+            else {
+                log.info("save meal {} and userId{}", meal, userId);
+                repository.put(meal.getId(), meal);
+                return meal;
+            }
         }
 
-        repository.put(meal.getId(), meal);
-        return meal;
+
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        Meal meal = repository.get(id);
+        Meal meal=get(id,userId);
         log.info("delete by id {} and userId{}", id, userId);
-
-        if (meal == null) {
-            return false;
-        }
-
-        return userId == meal.getUserId() && repository.remove(id) != null;
+        return (meal != null) && (repository.remove(id) != null);
     }
 
     @Override
     public Meal get(int id, int userId) {
         Meal meal = repository.get(id);
         log.info("get by id {} and userId{}", id, userId);
-
-        if (meal == null || userId != meal.getUserId()) {
-            return null;
-        }
-
-        return meal;
+        return (meal==null||meal.getUserId()!=userId)?null:meal;
     }
 
     @Override

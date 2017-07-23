@@ -22,8 +22,6 @@ public class SpringMain {
             adminUserController.create(new User(null, "userName", "email", "password", Role.ROLE_ADMIN));
             MealRestController mealRestController=appCtx.getBean(MealRestController.class);
             mealRestController.create(new Meal(LocalDateTime.of(2015, Month.MAY, 29, 13, 0), "Обед", 1000,1));
-            InMemoryMealRepositoryImpl repository=appCtx.getBean(InMemoryMealRepositoryImpl.class);
-            repository.getAll(1).forEach(System.out::println);
         }
     }
 }

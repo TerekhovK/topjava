@@ -23,7 +23,7 @@ public class MealRestController {
     private MealService service;
 
 
-    public List<MealWithExceed> getAll(String startDate, String endDate, String startTime, String endTime) {
+    public List<MealWithExceed> getAllFiltered(String startDate, String endDate, String startTime, String endTime) {
         LocalDate stDate = (startDate.equals("")) ? LocalDate.MIN : LocalDate.parse(startDate);
         LocalTime stTime = (startTime.equals("")) ? LocalTime.MIN : LocalTime.parse(startTime);
 
