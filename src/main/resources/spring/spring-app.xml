@@ -19,5 +19,11 @@
     <context:component-scan base-package="ru.javawebinar.**.service"/>
 
     <context:component-scan base-package="ru.javawebinar.**.web"/>
+    <beans>
+        <bean id="dataSource" />
 
+
+        <import resource="spring-db.xml"/>
+
+    </beans>
 </beans>
