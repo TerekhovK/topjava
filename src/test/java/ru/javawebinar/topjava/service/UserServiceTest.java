@@ -49,6 +49,8 @@ public class UserServiceTest {
         MATCHER.assertCollectionEquals(Arrays.asList(ADMIN, newUser, USER), service.getAll());
     }
 
+
+
     @Test(expected = DataAccessException.class)
     public void testDuplicateMailSave() throws Exception {
         service.save(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.ROLE_USER));
@@ -84,6 +86,12 @@ public class UserServiceTest {
 
     @Test
     public void testGetAll() throws Exception {
+        Collection<User> all = service.getAll();
+        MATCHER.assertCollectionEquals(Arrays.asList(ADMIN, USER), all);
+    }
+
+    @Test
+    public void testGetAllWithWrongUserId() throws Exception {
         Collection<User> all = service.getAll();
         MATCHER.assertCollectionEquals(Arrays.asList(ADMIN, USER), all);
     }
