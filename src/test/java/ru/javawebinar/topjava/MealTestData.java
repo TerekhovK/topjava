@@ -32,13 +32,6 @@ public class MealTestData {
     public static final List<Meal> USER_DATE_FILTERED_LIST_MEAL= Arrays.asList(MEAL6,MEAL5,MEAL4);
     public static final List<Meal> USER_DATETIME_FILTERED_LIST_MEAL= Arrays.asList(MEAL6,MEAL5);
 
-    public static final BeanMatcher<Meal> MATCHER = new BeanMatcher<>(
-            (expected, actual) ->
-                     expected == actual || Objects.equals(expected.getId(), actual.getId())
-                            && Objects.equals(expected.getDescription(), actual.getDescription())
-                            && Objects.equals(expected.getDateTime(), actual.getDateTime())
-                            && Objects.equals(expected.getCalories(), actual.getCalories()));
-
-
+    public static final BeanMatcher<Meal> MATCHER = new BeanMatcher<>();
 
 }

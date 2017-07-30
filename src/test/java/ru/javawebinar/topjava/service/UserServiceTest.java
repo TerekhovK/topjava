@@ -91,12 +91,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetAllWithWrongUserId() throws Exception {
-        Collection<User> all = service.getAll();
-        MATCHER.assertCollectionEquals(Arrays.asList(ADMIN, USER), all);
-    }
-
-    @Test
     public void testUpdate() throws Exception {
         User updated = new User(USER);
         updated.setName("UpdatedName");
