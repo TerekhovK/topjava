@@ -43,7 +43,7 @@ public class JpaMealRepositoryImpl implements MealRepository {
         return em.createNamedQuery(Meal.DELETE)
                 .setParameter("id", id)
                 .setParameter("userid", userId)
-                .executeUpdate() != 0;
+                .executeUpdate() == 1;
     }
 
     @Override
