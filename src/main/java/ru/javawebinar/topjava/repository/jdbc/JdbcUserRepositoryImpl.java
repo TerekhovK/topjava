@@ -25,6 +25,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
 
     private final SimpleJdbcInsert insertUser;
 
+
     @Autowired
     public JdbcUserRepositoryImpl(DataSource dataSource, JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.insertUser = new SimpleJdbcInsert(dataSource)
@@ -41,6 +42,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
 
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
+
             user.setId(newKey.intValue());
         } else {
             namedParameterJdbcTemplate.update(

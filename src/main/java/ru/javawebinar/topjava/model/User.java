@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
@@ -49,6 +50,10 @@ public class User extends AbstractNamedEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OrderBy("dateTime desc ")
+    private List<Meal> meals;
+
     @Column(name = "calories_per_day", columnDefinition = "int default 2000")
     @Range(min = 10, max = 10000)
     private int caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
@@ -75,6 +80,10 @@ public class User extends AbstractNamedEntity {
 
     public String getEmail() {
         return email;
+    }
+
+    public List<Meal> getMeals() {
+        return meals;
     }
 
     public void setEmail(String email) {
