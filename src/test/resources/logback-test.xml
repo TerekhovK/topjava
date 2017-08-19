@@ -17,7 +17,7 @@
             <pattern>%magenta(%msg%n)</pattern>
         </encoder>
     </appender>
-    <logger name="result" level="INFO" additivity="false">
+    <logger name="result" level="debug" additivity="false">
         <appender-ref ref="result"/>
     </logger>
 
@@ -26,7 +26,7 @@
 
     <logger name="ru.javawebinar.topjava" level="debug"/>
 
-    <root level="INFO">
+    <root level="debug">
         <appender-ref ref="console"/>
     </root>
 

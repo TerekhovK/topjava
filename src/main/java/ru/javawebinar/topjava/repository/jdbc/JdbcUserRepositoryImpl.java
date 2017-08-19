@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.repository.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -9,11 +10,17 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
 import javax.sql.DataSource;
-import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional(readOnly = true)
@@ -26,6 +33,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
+
 
     @Autowired
     public JdbcUserRepositoryImpl(DataSource dataSource, JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -45,10 +53,14 @@ public class JdbcUserRepositoryImpl implements UserRepository {
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
+            batchUpdate(user);
         } else {
             namedParameterJdbcTemplate.update(
                     "UPDATE users SET name=:name, email=:email, password=:password, " +
                             "registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id", parameterSource);
+            jdbcTemplate.update("DELETE FROM user_roles WHERE USER_ID=? ",user.getId());
+            batchUpdate(user);
+
         }
         return user;
     }
@@ -61,19 +73,61 @@ public class JdbcUserRepositoryImpl implements UserRepository {
 
     @Override
     public User get(int id) {
-        List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
-        return DataAccessUtils.singleResult(users);
+        List<User> user = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
+        setRoles(DataAccessUtils.singleResult(user));
+        return DataAccessUtils.singleResult(user);
     }
 
     @Override
     public User getByEmail(String email) {
 //        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
-        List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
-        return DataAccessUtils.singleResult(users);
+        List<User> user = jdbcTemplate.query("SELECT * FROM users WHERE email=?",ROW_MAPPER, email);
+        setRoles(DataAccessUtils.singleResult(user));
+        return DataAccessUtils.singleResult(user);
     }
 
     @Override
     public List<User> getAll() {
-        return jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
+        List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
+        Map<Integer, Set<Role>> roleMap = new HashMap<>();
+        jdbcTemplate.query("SELECT * FROM user_roles", (rs, rowCount) -> {
+                    String role = rs.getString("role");
+                    roleMap.computeIfAbsent(rs.getInt("user_id"), (id) -> EnumSet.noneOf(Role.class));
+                    roleMap.get(rs.getInt("user_id")).add(Role.valueOf(role));
+                    return rs.getString("user_id");
+                }
+        );
+        users.forEach(k -> k.setRoles(roleMap.get(k.getId())));
+        return users;
+    }
+
+    protected void setRoles(User u) {
+        if (u != null) {
+            List<Role> list = jdbcTemplate.query("SELECT * FROM user_roles WHERE user_id=?",
+                    (rs, rowCount) -> (Role.valueOf(rs.getString("role"))),
+                    u.getId());
+            u.setRoles(EnumSet.copyOf(list));
+        }
+    }
+
+    protected void batchUpdate(User user){
+        if(CollectionUtils.isEmpty(user.getRoles())){
+            return;
+        }
+        jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) VALUES (?,?)",new BatchPreparedStatementSetter() {
+
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Role role = (Role)user.getRoles().toArray()[i];
+                ps.setInt(1, user.getId());
+                ps.setString(2, role.toString());
+
+            }
+
+            @Override
+            public int getBatchSize() {
+                return user.getRoles().toArray().length;
+            }
+        });
     }
 }

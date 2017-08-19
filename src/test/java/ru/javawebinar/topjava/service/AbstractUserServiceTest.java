@@ -13,6 +13,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 
 import static ru.javawebinar.topjava.UserTestData.*;
 
@@ -54,8 +55,8 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void testGet() throws Exception {
-        User user = service.get(USER_ID);
-        MATCHER.assertEquals(USER, user);
+        User user = service.get(ADMIN_ID);
+        MATCHER.assertEquals(ADMIN, user);
     }
 
     @Test(expected = NotFoundException.class)
@@ -79,6 +80,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     public void testUpdate() throws Exception {
         User updated = new User(USER);
         updated.setName("UpdatedName");
+        updated.setRoles(EnumSet.of(Role.ROLE_ADMIN,Role.ROLE_USER));
         updated.setCaloriesPerDay(330);
         service.update(updated);
         MATCHER.assertEquals(updated, service.get(USER_ID));
