@@ -6,14 +6,12 @@
 <html>
 <head>
     <jsp:include page="fragments/headTag.jsp"/>
-    <title>Calories management</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
     <h3><spring:message code="meal.title"/></h3>
-    <form method="post" action="${pageContext.request.contextPath}/meals/filter">
+    <form method="post" action="meals/filter">
         <dl>
             <dt><spring:message code="meal.startDate"/>:</dt>
             <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
