@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -19,8 +20,6 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Repository
 @Transactional(readOnly = true)
@@ -58,7 +57,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
             namedParameterJdbcTemplate.update(
                     "UPDATE users SET name=:name, email=:email, password=:password, " +
                             "registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id", parameterSource);
-            jdbcTemplate.update("DELETE FROM user_roles WHERE USER_ID=? ",user.getId());
+            jdbcTemplate.update("DELETE FROM user_roles WHERE USER_ID=? ", user.getId());
             batchUpdate(user);
 
         }
@@ -81,7 +80,7 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     @Override
     public User getByEmail(String email) {
 //        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
-        List<User> user = jdbcTemplate.query("SELECT * FROM users WHERE email=?",ROW_MAPPER, email);
+        List<User> user = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         setRoles(DataAccessUtils.singleResult(user));
         return DataAccessUtils.singleResult(user);
     }
@@ -90,13 +89,11 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
         Map<Integer, Set<Role>> roleMap = new HashMap<>();
-        jdbcTemplate.query("SELECT * FROM user_roles", (rs, rowCount) -> {
-                    String role = rs.getString("role");
-                    roleMap.computeIfAbsent(rs.getInt("user_id"), (id) -> EnumSet.noneOf(Role.class));
-                    roleMap.get(rs.getInt("user_id")).add(Role.valueOf(role));
-                    return rs.getString("user_id");
-                }
-        );
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT * FROM user_roles");
+        while (rowSet.next()) {
+            roleMap.computeIfAbsent(rowSet.getInt("user_id"), (id) -> EnumSet.noneOf(Role.class));
+            roleMap.get(rowSet.getInt("user_id")).add(Role.valueOf(rowSet.getString("role")));
+        }
         users.forEach(k -> k.setRoles(roleMap.get(k.getId())));
         return users;
     }
@@ -110,24 +107,25 @@ public class JdbcUserRepositoryImpl implements UserRepository {
         }
     }
 
-    protected void batchUpdate(User user){
-        if(CollectionUtils.isEmpty(user.getRoles())){
-            return;
+    protected void batchUpdate(User user) {
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+
+            jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) VALUES (?,?)", new BatchPreparedStatementSetter() {
+                List<Role> roles = new ArrayList<>(user.getRoles());
+
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    Role role = roles.get(i);
+                    ps.setInt(1, user.getId());
+                    ps.setString(2, role.toString());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return roles.size();
+                }
+            });
         }
-        jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) VALUES (?,?)",new BatchPreparedStatementSetter() {
 
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                Role role = (Role)user.getRoles().toArray()[i];
-                ps.setInt(1, user.getId());
-                ps.setString(2, role.toString());
-
-            }
-
-            @Override
-            public int getBatchSize() {
-                return user.getRoles().toArray().length;
-            }
-        });
     }
 }
