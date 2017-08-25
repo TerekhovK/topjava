@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,10 +22,8 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.*;
  */
 @Controller
 @RequestMapping(value = "/meals")
-public class MealJSPRestController extends MealRestController {
-    public MealJSPRestController(MealService service) {
-        super(service);
-    }
+public class MealJSPRestController extends AbstractMealRestController {
+
 
     @RequestMapping(method = RequestMethod.GET)
     public String getAll( Model model) {
@@ -70,7 +67,6 @@ public class MealJSPRestController extends MealRestController {
     @RequestMapping(value = "/create", method = RequestMethod.GET)
     public String create(Model model) {
         model.addAttribute("meal", new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000));
-        model.addAttribute("action", "create");
         return "mealForm";
     }
 

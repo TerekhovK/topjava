@@ -73,16 +73,14 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     @Override
     public User get(int id) {
         List<User> user = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
-        setRoles(DataAccessUtils.singleResult(user));
-        return DataAccessUtils.singleResult(user);
+        return setRoles(DataAccessUtils.singleResult(user));
     }
 
     @Override
     public User getByEmail(String email) {
 //        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
         List<User> user = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
-        setRoles(DataAccessUtils.singleResult(user));
-        return DataAccessUtils.singleResult(user);
+        return setRoles(DataAccessUtils.singleResult(user));
     }
 
     @Override
@@ -98,13 +96,14 @@ public class JdbcUserRepositoryImpl implements UserRepository {
         return users;
     }
 
-    protected void setRoles(User u) {
+    protected User setRoles(User u) {
         if (u != null) {
             List<Role> list = jdbcTemplate.query("SELECT * FROM user_roles WHERE user_id=?",
                     (rs, rowCount) -> (Role.valueOf(rs.getString("role"))),
                     u.getId());
             u.setRoles(EnumSet.copyOf(list));
         }
+        return u;
     }
 
     protected void batchUpdate(User user) {

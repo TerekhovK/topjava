@@ -38,6 +38,15 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     }
 
+    @Test
+    public void testCreateWithNoRoles() throws Exception {
+        User newUser = new User(null, "New", "new@gmail.com", "newPass", 1555, false,EnumSet.noneOf(Role.class));
+        User created = service.create(newUser);
+        newUser.setId(created.getId());
+        MATCHER.assertCollectionEquals(Arrays.asList(ADMIN, newUser, USER), service.getAll());
+
+    }
+
     @Test(expected = DataAccessException.class)
     public void testDuplicateMailCreate() throws Exception {
         service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.ROLE_USER));

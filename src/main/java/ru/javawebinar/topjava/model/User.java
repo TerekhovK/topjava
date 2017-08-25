@@ -3,20 +3,16 @@ package ru.javawebinar.topjava.model;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.mapping.*;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
-import org.springframework.cglib.core.CollectionUtils;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.*;
-import java.util.Collection;
+import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -118,7 +114,7 @@ public class User extends AbstractNamedEntity {
     }
 
     public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+        this.roles = CollectionUtils.isEmpty(roles)?EnumSet.noneOf(Role.class):roles;
 
     }
 
