@@ -88,4 +88,24 @@ public class MealRestControllerTest extends AbstractControllerTest {
                         MealsUtil.createWithExceed(MEAL1, false)));
     }
 
+    @Test
+    public void testFilterWithNull() throws Exception {
+        mockMvc.perform(get(REST_URL + "filter")
+                .param("startDate", "2015-05-31")
+                .param("endTime", "11:00"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(MATCHER_WITH_EXCEED.contentListMatcher(
+                        MealsUtil.createWithExceed(MEAL4, true)));
+    }
+
+
+    @Test
+    public void testCustomFilter() throws Exception {
+        mockMvc.perform(get(REST_URL + "customFilter?startDateTime=2015-05-31T07:00&endDateTime=2015-05-31T11:00:00"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(MATCHER_WITH_EXCEED.contentListMatcher(
+                        MealsUtil.createWithExceed(MEAL4, true)));
+    }
 }
