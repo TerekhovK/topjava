@@ -39,4 +39,28 @@ $(function () {
         ]
     });
     makeEditable();
+    checkBox();
+
 });
+function checkBox(){
+
+
+
+        $("input:checkbox").click(function () {
+
+            var check_id = $(this).parents('tr').attr("id");
+            var check = $(this).prop( 'checked' );
+
+            $.ajax({
+                url: ajaxUrl + check_id,
+                type: 'POST',
+                data: "checked="+check,
+                success: function () {
+                    updateTable();
+                    successNoty('update');
+                }
+            });
+        });
+
+
+}
