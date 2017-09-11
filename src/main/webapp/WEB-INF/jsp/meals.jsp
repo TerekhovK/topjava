@@ -58,7 +58,7 @@
                     </a>
                 </div>
                 <div class=" col-xs-2">
-                    <a class="btn btn-default" type="button" onclick="filterDate()">
+                    <a class="btn btn-default" type="button" onclick="newUpdateTable()">
                         <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
                         <spring:message code="meal.filter"/>
                     </a>

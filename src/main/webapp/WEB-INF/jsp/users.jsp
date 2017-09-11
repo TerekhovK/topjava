@@ -34,7 +34,7 @@
                     </thead>
                     <c:forEach items="${users}" var="user">
                         <jsp:useBean id="user" scope="page" type="ru.javawebinar.topjava.model.User"/>
-                        <tr id="${user.id}">
+                        <tr id="${user.id}" class="${user.enabled ? '' : 'danger'}">
                             <td><c:out value="${user.name}"/></td>
                             <td><a href="mailto:${user.email}">${user.email}</a></td>
                             <td>${user.roles}</td>
